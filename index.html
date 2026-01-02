@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Há sorte em ciência? — 2026</title>
+  <style>
+    :root{
+      --bgA:#070a1a;
+      --bgB:#1a0b2e;
+      --stroke:rgba(255,255,255,.14);
+      --text:#eef2ff;
+      --muted:#c3ccff;
+      --good:#2ee59d;
+      --warn:#ffd166;
+      --hard:#ff4d6d;
+      --neon1:#7c5cff;
+      --neon2:#00d4ff;
+      --neon3:#ff2f7a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      min-height:100vh;
+      padding:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        radial-gradient(1200px 800px at 15% 10%, #2b1b74 0%, transparent 60%),
+        radial-gradient(900px 700px at 85% 20%, #0a8cff 0%, transparent 55%),
+        radial-gradient(900px 700px at 60% 90%, #ff2f7a 0%, transparent 50%),
+        linear-gradient(135deg, var(--bgA), var(--bgB));
+      overflow-x:hidden;
+    }
+    .page{ width:min(1080px, 100%); }
+    .wrap{
+      width:100%;
+      display:grid;
+      grid-template-columns: .98fr 1.02fr;
+      gap:16px;
+      align-items:stretch;
+    }
+    @media (max-width: 920px){
+      .wrap{grid-template-columns:1fr}
+      body{padding:14px}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      padding:16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+    }
+    h1{
+      margin:0 0 6px;
+      font-size: clamp(22px, 2.7vw, 32px);
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:0 0 12px;
+      color:var(--muted);
+      line-height:1.35;
+      font-size:14.5px;
+    }
+
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:end; margin-top:10px; }
+    label{ font-size:13px; color:var(--muted); display:block; margin-bottom:6px; }
+    select, button{
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(15,20,55,.55);
+      color:var(--text);
+      padding:12px 12px;
+      font-size:15px;
+      outline:none;
+    }
+    select{ flex:1 1 260px; }
+
+    button{
+      border:none;
+      cursor:pointer;
+      font-weight:900;
+      padding:12px 16px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition: transform .12s ease, filter .12s ease, opacity .12s ease;
+      background: linear-gradient(90deg, var(--neon1), var(--neon2), var(--neon3));
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      width:100%;
+    }
+    button:hover{ transform: translateY(-1px); filter:brightness(1.06); }
+    button:active{ transform: translateY(0px); filter:brightness(.98); }
+    button:disabled{ opacity:.55; cursor:not-allowed; filter:saturate(.7); }
+
+    .pill{
+      display:flex;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.22);
+      color:var(--muted);
+      font-size:13.5px;
+      line-height:1.35;
+      margin-top:10px;
+    }
+    .pill strong{color:#fff}
+
+    /* SLOT */
+    .slotArea{ display:flex; flex-direction:column; gap:14px; justify-content:center; align-items:center; min-height: 460px; }
+    .slotCard{
+      width:min(460px, 92vw);
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.22);
+      box-shadow: 0 25px 70px rgba(0,0,0,.45);
+      overflow:hidden;
+      position:relative;
+    }
+    .slotTopGlow{ height:10px; background: linear-gradient(90deg, var(--neon1), var(--neon2), var(--neon3)); }
+    .slotInner{ padding:16px; }
+
+    .digits{ display:flex; gap:12px; justify-content:center; align-items:center; padding:12px 10px 10px; }
+    .digit{
+      width:78px; height:104px; border-radius:18px;
+      border:1px solid rgba(255,255,255,.16);
+      background:
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,.18), rgba(0,0,0,.20) 60%),
+        rgba(15,20,55,.40);
+      display:grid; place-items:center; position:relative; overflow:hidden;
+    }
+    .digit::after{
+      content:""; position:absolute; inset:0;
+      background: linear-gradient(180deg, rgba(255,255,255,.16), transparent 35%, rgba(0,0,0,.20));
+      pointer-events:none;
+    }
+    .digit span{
+      font-weight:1000; font-size:60px; letter-spacing:1px;
+      text-shadow: 0 10px 24px rgba(0,0,0,.35);
+      transform: translateY(0); transition: transform 0.35s ease;
+    }
+
+    .slotBtnWrap{ padding: 0 16px 10px; display:grid; grid-template-columns: 1fr; gap:10px; }
+    .slotCaption{
+      text-align:center; color: rgba(255,255,255,.86);
+      font-size:13px; padding: 6px 14px 14px; line-height:1.25;
+    }
+    .meterWrap{ padding:0 16px 16px; }
+    .meterLabel{
+      display:flex; justify-content:space-between; font-size:12.5px;
+      color:var(--muted); margin-bottom:8px; gap:10px; flex-wrap:wrap;
+    }
+    .meter{ height:12px; border-radius:999px; border:1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.06); overflow:hidden; }
+    .bar{ height:100%; width:0%; background: linear-gradient(90deg, var(--neon1), var(--neon2), var(--neon3)); transition: width .18s ease; }
+    .shake{ animation: shake .28s ease-in-out 2; }
+    @keyframes shake{
+      0%{transform: translateX(0)}
+      25%{transform: translateX(-4px)}
+      50%{transform: translateX(4px)}
+      75%{transform: translateX(-3px)}
+      100%{transform: translateX(0)}
+    }
+    .pop{ animation: pop .32s ease; }
+    @keyframes pop{ 0%{transform: scale(.98)} 100%{transform: scale(1)} }
+
+    .footer{ text-align:center; color: rgba(255,255,255,.78); font-size:12.5px; margin-top:14px; padding:10px 0 2px; width:100%; }
+
+    /* MODAL */
+    .modalBackdrop{
+      position:fixed; inset:0; background: rgba(0,0,0,.55);
+      display:none; align-items:center; justify-content:center;
+      padding:18px; z-index:999;
+    }
+    .modalBackdrop.show{ display:flex; }
+    .modal{
+      width:min(720px, 96vw);
+      border-radius:18px; border:1px solid rgba(255,255,255,.18);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.05));
+      box-shadow: 0 30px 90px rgba(0,0,0,.55);
+      backdrop-filter: blur(10px);
+      overflow:hidden;
+      max-height: 90vh;
+      position:relative;
+    }
+    .modalTop{
+      padding:12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background: rgba(0,0,0,.18);
+      border-bottom:1px solid rgba(255,255,255,.12);
+    }
+    .badge{
+      font-weight:1000; font-size:12px; padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.08);
+      letter-spacing:.3px; text-transform:uppercase;
+      display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
+    }
+    .badge.good{ color: var(--good); }
+    .badge.warn{ color: var(--warn); }
+    .badge.hard{ color: var(--hard); }
+
+    .modalBody{
+      padding:14px;
+      max-height: 62vh;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .modalTitle{ margin:0 0 10px; font-size:18px; font-weight:1000; }
+
+    .block{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      border-radius:14px;
+      padding:12px;
+      margin:10px 0;
+    }
+    .block h3{
+      margin:0 0 8px;
+      font-size:14px;
+      font-weight:1000;
+      color:#fff;
+      letter-spacing:.2px;
+    }
+    .block p{
+      margin:0;
+      font-size:15.3px;
+      line-height:1.35;
+      font-weight:800;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+    .mutedNote{
+      color: var(--muted);
+      font-weight:650;
+      display:block;
+      margin-top:10px;
+      font-size:13.5px;
+      line-height:1.35;
+    }
+
+    .modalBtns{ display:flex; gap:10px; flex-wrap:wrap; padding:0 14px 14px; }
+    .xbtn{
+      background: rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.18);
+      font-weight:1000;
+      padding:10px 12px;
+      border-radius:12px;
+      cursor:pointer;
+      color: var(--text);
+    }
+
+    /* FOGOS (para cima) */
+    #fireworks{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:2000;
+      overflow:hidden;
+      display:none;
+    }
+    .spark{
+      position:absolute;
+      width:6px;
+      height:6px;
+      border-radius:999px;
+      opacity:.95;
+      transform: translate(0,0);
+      animation: flyUp cubic-bezier(.12,.75,.22,1) forwards;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+    @keyframes flyUp{
+      0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+      10%  { opacity: .95; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(.9); opacity: 0; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="fireworks"></div>
+
+  <div class="page">
+    <div class="wrap">
+      <section class="card slotArea">
+        <div class="slotCard" id="slotCard" aria-label="Roleta 2026">
+          <div class="slotTopGlow"></div>
+          <div class="slotInner">
+            <div class="digits" aria-label="Contador 2026">
+              <div class="digit"><span id="d0">2</span></div>
+              <div class="digit"><span id="d1">0</span></div>
+              <div class="digit"><span id="d2">2</span></div>
+              <div class="digit"><span id="d3">6</span></div>
+            </div>
+            <div class="slotBtnWrap">
+              <button id="btnGirar">⚡ Rodar a Sorte (1x por perfil)</button>
+            </div>
+          </div>
+
+          <div class="slotCaption" id="slotCaption">
+            🎲 <b>Vale 1x por perfil</b> (graduando/mestrando/doutorando/pós-doc/professor/colaborador).<br/>
+            Troque o perfil para rodar naquele perfil.
+          </div>
+
+          <div class="meterWrap">
+            <div class="meterLabel">
+              <span id="meterTxt">Escolha o perfil ao lado e rode.</span>
+              <span id="tempoTxt">2026</span>
+            </div>
+            <div class="meter"><div class="bar" id="bar"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h1>Há sorte em ciência?</h1>
+        <p class="sub">
+          Você escolhe o perfil. O ano <b>2026</b> decide sua <b>SORTE</b> e um <b>mini-plano</b>.
+          Regra: <b>1 rodada por perfil</b>. Sem reset. Sem segunda chance.
+        </p>
+
+        <div class="row">
+          <div style="flex:1 1 260px">
+            <label for="perfil">Seu perfil</label>
+            <select id="perfil">
+              <option value="graduando">Graduando</option>
+              <option value="mestrando">Mestrando</option>
+              <option value="doutorando">Doutorando</option>
+              <option value="posdoc">Pós-doc</option>
+              <option value="professor">Professor</option>
+              <option value="colaborador">Colaborador</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pill">
+          <div>📌 <strong>Regra:</strong> 1 vez por perfil. Mudou o perfil → você tem a chance daquele perfil.</div>
+        </div>
+
+        <div class="pill">
+          <div>🎶 <strong>Vitória:</strong> toca uma musiquinha de 2026 no resultado.</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">
+      Feito por <b>Ernandes Sobreira</b> • “Há sorte em ciência?” • 2026
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modalBackdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+    <div class="modal" role="document">
+      <div class="modalTop">
+        <span class="badge" id="badgeTipo">—</span>
+        <button class="xbtn" id="btnFechar" aria-label="Fechar">✕</button>
+      </div>
+
+      <div class="modalBody">
+        <p class="modalTitle" id="modalTitle">Resultado 2026</p>
+
+        <div class="block">
+          <h3>🍀 SORTE 2026</h3>
+          <p id="modalSorte">—</p>
+        </div>
+
+        <div class="block">
+          <h3>🧩 Mini-plano (2–3 ações)</h3>
+          <p id="modalTarefas">—</p>
+        </div>
+
+        <span class="mutedNote" id="modalMeta">
+          📌 Regra: 1 rodada por perfil. Sem reset. Sem segunda chance.
+        </span>
+      </div>
+
+      <div class="modalBtns">
+        <button class="xbtn" id="btnCopiar">📋 Copiar</button>
+        <button class="xbtn" id="btnSalvar">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const perfilSel = document.getElementById("perfil");
+    const btnGirar = document.getElementById("btnGirar");
+    const slotCard = document.getElementById("slotCard");
+    const slotCaption = document.getElementById("slotCaption");
+
+    const d0 = document.getElementById("d0");
+    const d1 = document.getElementById("d1");
+    const d2 = document.getElementById("d2");
+    const d3 = document.getElementById("d3");
+
+    const bar = document.getElementById("bar");
+    const meterTxt = document.getElementById("meterTxt");
+    const tempoTxt = document.getElementById("tempoTxt");
+
+    const fireworksLayer = document.getElementById("fireworks");
+
+    // Modal
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const btnFechar = document.getElementById("btnFechar");
+    const badgeTipo = document.getElementById("badgeTipo");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalSorte = document.getElementById("modalSorte");
+    const modalTarefas = document.getElementById("modalTarefas");
+    const modalMeta = document.getElementById("modalMeta");
+    const btnCopiar = document.getElementById("btnCopiar");
+    const btnSalvar = document.getElementById("btnSalvar");
+
+    const labels = {
+      graduando:"Graduando",
+      mestrando:"Mestrando",
+      doutorando:"Doutorando",
+      posdoc:"Pós-doc",
+      professor:"Professor",
+      colaborador:"Colaborador"
+    };
+
+    const banco = {
+      graduando: [
+        {type:"good", sorte:"Seu TCC será nota 10 (ou muito perto). Você vai surpreender com clareza.", tarefas:"1) Entregue o projeto.\n2) Faça 1 figura boa.\n3) Ensaie 6 slides."},
+        {type:"warn", sorte:"Seu TCC vai mudar de tema (uma vez) — e isso vai melhorar o resultado final.", tarefas:"1) Corte o escopo.\n2) Cronograma 4 semanas.\n3) Reunião quinzenal."},
+        {type:"hard", sorte:"Você vai se enrolar com prazos no 1º semestre — mas dá pra virar com rotina.", tarefas:"1) 2 blocos/semana.\n2) 1 figura/semana.\n3) Feedback rápido."},
+        {type:"good", sorte:"Você vai entrar num projeto/IC e crescer muito com isso.", tarefas:"1) Defina seu recorte.\n2) Leia 5 artigos.\n3) Faça 1 mini-relato."},
+        {type:"warn", sorte:"Você precisa escrever muito mais. O ano te cobra texto.", tarefas:"1) 2 páginas/semana.\n2) Revisão leve.\n3) Entregar versão."}
+      ],
+      mestrando: [
+        {type:"good", sorte:"Você terá 2 resumos aceitos e 1 convite de colaboração/coautoria.", tarefas:"1) Feche 1 análise.\n2) Melhore 1 figura.\n3) Treine apresentação."},
+        {type:"warn", sorte:"Seu artigo será aceito com ressalvas — dá pra arrumar, mas exige capricho.", tarefas:"1) Planilha de revisões.\n2) Refazer 2 figuras.\n3) Reescrever 1 seção."},
+        {type:"hard", sorte:"Seu mestrado pode atrasar alguns meses se você não subir o nível de análise e escrita.", tarefas:"1) Rotina fixa.\n2) Minicurso.\n3) Entrega quinzenal."},
+        {type:"good", sorte:"Projeto aprovado para financiamento/bolsa: destrava tudo.", tarefas:"1) Ajuste objetivos.\n2) Organize dados.\n3) Cronograma curto."},
+        {type:"warn", sorte:"Você precisa aprender estatística (ou você trava). 2026 vai te forçar.", tarefas:"1) 1 curso curto.\n2) Refazer 1 análise.\n3) Figura final."}
+      ],
+      doutorando: [
+        {type:"good", sorte:"Você terá 1 artigo aceito e vai viajar para congresso com apresentação forte.", tarefas:"1) Feche 1 manuscrito.\n2) 3 figuras publicáveis.\n3) Treine fala."},
+        {type:"warn", sorte:"Você terá 2–3 rejeições (ou desk-reject). Normal. Depois você acerta o alvo.", tarefas:"1) Trocar revista.\n2) Ajustar narrativa.\n3) Melhorar figuras."},
+        {type:"hard", sorte:"Você será cobrado por estatística/resultado: sem melhorar isso, 2026 pesa.", tarefas:"1) Curso rápido.\n2) Refazer 1 análise.\n3) Texto com números."},
+        {type:"good", sorte:"Você vai ampliar muito sua rede (parcerias novas e coautorias).", tarefas:"1) 2 eventos.\n2) 5 contatos.\n3) 2 follow-ups."},
+        {type:"warn", sorte:"Você precisa conversar mais com seu orientador(a). 2026 vai cobrar alinhamento.", tarefas:"1) Reunião quinzenal.\n2) Pauta curta.\n3) Entregável."}
+      ],
+      posdoc: [
+        {type:"good", sorte:"Seu pós-doc será uma bênção para políticas públicas: vira nota técnica e artigo grande.", tarefas:"1) 1 boletim.\n2) 1 nota técnica.\n3) 1 reunião com gestão."},
+        {type:"warn", sorte:"Você vai produzir muito, mas pode dispersar. Foco vira o diferencial.", tarefas:"1) 2 perguntas.\n2) Entregáveis.\n3) Menos frentes."},
+        {type:"hard", sorte:"Cobrança forte por impacto social. Se responder bem, vira vitrine.", tarefas:"1) Produto aplicado.\n2) Comunicação clara.\n3) Parceria."},
+        {type:"good", sorte:"Você vai viajar internacionalmente e fazer palestra importante.", tarefas:"1) Ensaiar talk.\n2) Ajustar slides.\n3) Publicar 1 resultado."},
+        {type:"warn", sorte:"Você precisa conectar mais com a comunidade (e mostrar devolutiva).", tarefas:"1) 1 encontro.\n2) 1 material.\n3) 1 retorno público."}
+      ],
+      professor: [
+        {type:"good", sorte:"Você terá 4 artigos aceitos no grupo (ou muito perto) e reconhecimento.", tarefas:"1) Orientar quinzenal.\n2) Cobrar entregável.\n3) Padronizar figuras."},
+        {type:"warn", sorte:"Você vai perceber que precisa orientar com mais frequência — senão os alunos travam.", tarefas:"1) Agenda fixa.\n2) Pauta curta.\n3) Entregável/quinzena."},
+        {type:"hard", sorte:"Uma crise de tempo vai te atropelar: você precisa cortar coisas e priorizar.", tarefas:"1) Bloquear escrita.\n2) Delegar.\n3) Dizer não."},
+        {type:"good", sorte:"Você vai conectar mais com a comunidade (audiência, boletins, extensão).", tarefas:"1) 1 boletim.\n2) 1 audiência.\n3) 1 palestra."},
+        {type:"warn", sorte:"Você vai ter que orientar melhor (mais presença e feedback). 2026 cobra isso.", tarefas:"1) Reunião quinzenal.\n2) Feedback rápido.\n3) Cobrar figura."}
+      ],
+      colaborador: [
+        {type:"good", sorte:"Você será peça-chave em um projeto ou artigo importante em 2026.", tarefas:"1) Assuma uma tarefa clara.\n2) Entregue no prazo.\n3) Comunique bem."},
+        {type:"warn", sorte:"Você vai precisar se posicionar mais: colaborar não é só executar.", tarefas:"1) Dê opinião técnica.\n2) Sugira melhorias.\n3) Participe das decisões."},
+        {type:"hard", sorte:"Você pode ficar sobrecarregado se não delimitar seu papel.", tarefas:"1) Defina escopo.\n2) Combine prazos.\n3) Evite assumir tudo."},
+        {type:"good", sorte:"Você vai ampliar sua rede científica e ser lembrado para novas parcerias.", tarefas:"1) Mantenha contato.\n2) Faça follow-up.\n3) Registre contribuições."},
+        {type:"warn", sorte:"Você precisará aprender algo novo (software, método ou linguagem) para entregar melhor.", tarefas:"1) Curso rápido.\n2) Prática aplicada.\n3) Documente o aprendizado."}
+      ]
+    };
+
+    function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+    function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+
+    function setBadge(type){
+      badgeTipo.className = "badge";
+      if(type === "good"){ badgeTipo.classList.add("good"); badgeTipo.textContent = "SORTE BOA ✨"; }
+      else if(type === "hard"){ badgeTipo.classList.add("hard"); badgeTipo.textContent = "PANCADA 😵"; }
+      else { badgeTipo.classList.add("warn"); badgeTipo.textContent = "ALERTA 🔄"; }
+    }
+
+    function showModal(){ modalBackdrop.classList.add("show"); }
+    function closeModal(){ modalBackdrop.classList.remove("show"); }
+
+    btnFechar.addEventListener("click", closeModal);
+    modalBackdrop.addEventListener("click", (e)=>{ if(e.target === modalBackdrop) closeModal(); });
+    window.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeModal(); });
+
+    // Fogos para cima
+    function fireworksUp(){
+      fireworksLayer.innerHTML = "";
+      fireworksLayer.style.display = "block";
+
+      const colors = ["#7c5cff","#00d4ff","#ff2f7a","#2ee59d","#ffd166","#ffffff"];
+      const bursts = 3;
+      const sparksPerBurst = 70;
+      const durMin = 950, durMax = 1650;
+
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      for(let b=0;b<bursts;b++){
+        const baseX = Math.random() * w;
+        const baseY = h - 30;
+        const burstDelay = b * 150 + Math.random()*130;
+
+        for(let i=0;i<sparksPerBurst;i++){
+          const s = document.createElement("div");
+          s.className = "spark";
+          s.style.background = colors[Math.floor(Math.random()*colors.length)];
+
+          const angle = (Math.random() * Math.PI) + Math.PI; // 180..360
+          const power = 130 + Math.random()*300;
+          const dx = Math.cos(angle) * power;
+          const dy = Math.sin(angle) * power;
+
+          const upBoost = 320 + Math.random()*520;
+          const finalDy = dy - upBoost;
+
+          const dur = durMin + Math.random()*(durMax-durMin);
+          const delay = burstDelay + Math.random()*140;
+
+          s.style.left = baseX + "px";
+          s.style.top = baseY + "px";
+          s.style.animationDuration = dur + "ms";
+          s.style.animationDelay = delay + "ms";
+          s.style.setProperty("--dx", dx.toFixed(1) + "px");
+          s.style.setProperty("--dy", finalDy.toFixed(1) + "px");
+
+          const size = 4 + Math.random()*7;
+          s.style.width = size + "px";
+          s.style.height = size + "px";
+          s.style.opacity = (0.78 + Math.random()*0.22).toFixed(2);
+
+          fireworksLayer.appendChild(s);
+        }
+      }
+
+      setTimeout(()=>{
+        fireworksLayer.style.display = "none";
+        fireworksLayer.innerHTML = "";
+      }, 2600);
+    }
+
+    // Música de vitória (mais alta)
+    let audioCtx = null;
+    function ensureAudio(){
+      if(!audioCtx){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if(audioCtx.state === "suspended"){
+        audioCtx.resume().catch(()=>{});
+      }
+      return audioCtx;
+    }
+
+    function playVictory2026(){
+      const ctx = ensureAudio();
+      const now = ctx.currentTime;
+
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.55, now + 0.02);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + 1.7);
+      master.connect(ctx.destination);
+
+      const filt = ctx.createBiquadFilter();
+      filt.type = "lowpass";
+      filt.frequency.setValueAtTime(4200, now);
+      filt.Q.setValueAtTime(0.7, now);
+      filt.connect(master);
+
+      const delay = ctx.createDelay(0.25);
+      delay.delayTime.setValueAtTime(0.10, now);
+      const fb = ctx.createGain();
+      fb.gain.setValueAtTime(0.18, now);
+      delay.connect(fb);
+      fb.connect(delay);
+      delay.connect(master);
+
+      function env(g, t, len, vol){
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + len);
+      }
+
+      function note(freq, t, len=0.14, vol=0.22, type="sawtooth"){
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(freq, t);
+        env(g, t, len, vol);
+
+        o.connect(g);
+        g.connect(filt);
+        g.connect(delay);
+
+        o.start(t);
+        o.stop(t + len + 0.03);
+      }
+
+      const C4=261.63, D4=293.66, E4=329.63, F4=349.23, G4=392.00, A4=440.00, B4=493.88, C5=523.25, E5=659.25, G5=783.99;
+      const melody = [
+        [C4,0.00],[E4,0.12],[G4,0.24],[C5,0.36],
+        [E5,0.52],[G5,0.68],[E5,0.84],[C5,1.00],
+        [G4,1.16],[C5,1.28],[E5,1.40]
+      ];
+      melody.forEach(([f, off]) => note(f, now + off, 0.14, 0.24, "sawtooth"));
+
+      const chords = [
+        [C4,E4,G4, 0.02],
+        [F4,A4,C5, 0.50],
+        [G4,B4,D4*2, 0.98],
+        [C4,E4,G4, 1.30]
+      ];
+      chords.forEach(([r, t3, f, off])=>{
+        note(r,  now+off, 0.32, 0.10, "triangle");
+        note(t3, now+off, 0.32, 0.08, "triangle");
+        note(f,  now+off, 0.32, 0.07, "triangle");
+      });
+
+      const C3=130.81, G3=196.00, F3=174.61;
+      note(C3, now+0.02, 0.35, 0.12, "square");
+      note(F3, now+0.50, 0.35, 0.10, "square");
+      note(G3, now+0.98, 0.35, 0.11, "square");
+      note(C3, now+1.30, 0.45, 0.12, "square");
+    }
+
+    // Uma vez por perfil
+    const STORAGE_KEY = "sorte2026_oncePerProfile";
+    function loadState(){
+      try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
+      catch(e){ return {}; }
+    }
+    function saveState(obj){ localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }
+    function alreadySpun(profile){
+      const st = loadState();
+      return !!st[profile]?.spun;
+    }
+    function saveResult(profile, result){
+      const st = loadState();
+      st[profile] = { spun:true, result };
+      saveState(st);
+    }
+
+    // Suspense 2026
+    let timers = [];
+    function clearTimers(){ timers.forEach(t=>clearInterval(t)); timers = []; }
+
+    function spinDigits(totalMs){
+      const target = ["2","0","2","6"];
+      const spans = [d0,d1,d2,d3];
+
+      spans.forEach(s => s.classList.remove("pop"));
+      slotCard.classList.remove("shake");
+      slotCard.classList.add("shake");
+
+      const suspenseLines = [
+        "🧪 Misturando destino científico…",
+        "📚 Conferindo referências…",
+        "📊 Validando gráficos…",
+        "🧠 Julgando seu método…",
+        "⚡ Quase revelando…"
+      ];
+      let msgI = 0;
+      meterTxt.textContent = suspenseLines[msgI];
+      const msgTimer = setInterval(()=>{
+        msgI = (msgI + 1) % suspenseLines.length;
+        meterTxt.textContent = suspenseLines[msgI];
+      }, 700);
+
+      const start = performance.now();
+
+      const configs = spans.map((_, i) => {
+        const base = 44 + i*20;
+        const jitter = Math.floor(Math.random()*55);
+        const interval = base + jitter;
+        const stopAt = clamp(totalMs - (1100 + i*380) + Math.floor(Math.random()*420), 1600, totalMs-260);
+        return { interval, stopAt };
+      });
+
+      configs.forEach((cfg, i) => {
+        const span = spans[i];
+        let current = parseInt(span.textContent, 10) || 0;
+
+        const id = setInterval(() => {
+          const elapsed = performance.now() - start;
+          current = (current + 1) % 10;
+          span.style.transform = "translateY(-12px)";
+          span.textContent = String(current);
+          setTimeout(()=> span.style.transform="translateY(0)", 70);
+
+          if (elapsed >= cfg.stopAt){
+            clearInterval(id);
+            span.textContent = target[i];
+            span.classList.add("pop");
+          }
+        }, cfg.interval);
+
+        timers.push(id);
+      });
+
+      bar.style.width = "0%";
+      const meterStart = performance.now();
+      const meterId = setInterval(() => {
+        const e = performance.now() - meterStart;
+        const t = clamp(e / totalMs, 0, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        bar.style.width = (eased * 100).toFixed(1) + "%";
+        if (t >= 1) clearInterval(meterId);
+      }, 70);
+      timers.push(meterId);
+
+      return new Promise(resolve => {
+        setTimeout(() => {
+          clearInterval(msgTimer);
+          spans.forEach((span, i)=> span.textContent = target[i]);
+          bar.style.width = "100%";
+          meterTxt.textContent = "😮 Revelando sua sorte…";
+          resolve();
+        }, totalMs + 60);
+      });
+    }
+
+    function refreshUI(){
+      const profile = perfilSel.value;
+      const st = loadState();
+      const done = !!st[profile]?.spun;
+
+      if(done){
+        btnGirar.disabled = true;
+        btnGirar.textContent = "✅ Já foi (este perfil já rodou)";
+        meterTxt.textContent = "Este perfil já jogou. Troque o perfil para jogar o próximo.";
+      }else{
+        btnGirar.disabled = false;
+        btnGirar.textContent = "⚡ Rodar a Sorte (1x por perfil)";
+        meterTxt.textContent = "Este perfil ainda não jogou. Pode rodar.";
+      }
+
+      tempoTxt.textContent = "2026";
+      slotCaption.innerHTML =
+        `🎲 <b>Vale 1x por perfil</b>. Perfil atual: <b>${labels[profile]}</b>.<br/>
+         Dica: troque o perfil para jogar novamente (no outro perfil).`;
+    }
+
+    async function play(){
+      const profile = perfilSel.value;
+      if(alreadySpun(profile)) return;
+
+      btnGirar.disabled = true;
+      clearTimers();
+
+      const totalMs = 4200 + Math.floor(Math.random() * 3800);
+      await spinDigits(totalMs);
+
+      const out = pick(banco[profile] || banco.graduando);
+      setBadge(out.type);
+
+      modalTitle.textContent = `Resultado 2026 • ${labels[profile]}`;
+      modalSorte.textContent = out.sorte;
+      modalTarefas.textContent = out.tarefas;
+      modalMeta.textContent = "📌 Regra: 1 rodada por perfil. Sem reset. Sem segunda chance.";
+
+      saveResult(profile, {
+        badge: badgeTipo.textContent,
+        title: modalTitle.textContent,
+        sorte: out.sorte,
+        tarefas: out.tarefas
+      });
+
+      await new Promise(r => setTimeout(r, 950));
+
+      fireworksUp();
+      playVictory2026();
+      showModal();
+
+      refreshUI();
+    }
+
+    btnGirar.addEventListener("click", play);
+
+    perfilSel.addEventListener("change", () => {
+      closeModal();
+      refreshUI();
+    });
+
+    btnCopiar.addEventListener("click", async () => {
+      const txt = `${modalTitle.textContent}\n\n🍀 SORTE 2026:\n${modalSorte.textContent}\n\n🧩 MINI-PLANO:\n${modalTarefas.textContent}\n\n${modalMeta.textContent}`.trim();
+      try{
+        await navigator.clipboard.writeText(txt);
+        btnCopiar.textContent = "✅ Copiado!";
+        setTimeout(()=> btnCopiar.textContent = "📋 Copiar", 1200);
+      }catch(e){
+        alert("Não consegui copiar automaticamente. Selecione o texto e copie manualmente.");
+      }
+    });
+
+    btnSalvar.addEventListener("click", () => {
+      const profile = perfilSel.value;
+      const saved = {
+        when: new Date().toISOString(),
+        profile: labels[profile],
+        badge: badgeTipo.textContent,
+        title: modalTitle.textContent,
+        sorte: modalSorte.textContent,
+        tarefas: modalTarefas.textContent
+      };
+      localStorage.setItem(`sorte2026_result_${profile}`, JSON.stringify(saved));
+      btnSalvar.textContent = "✅ Salvo!";
+      setTimeout(()=> btnSalvar.textContent = "💾 Salvar", 1200);
+    });
+
+    refreshUI();
+  </script>
+</body>
+</html>
