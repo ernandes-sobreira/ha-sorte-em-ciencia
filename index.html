@@ -289,11 +289,11 @@
         <div class="slotCard" id="slotCard" aria-label="Roleta 2026">
           <div class="slotTopGlow"></div>
           <div class="slotInner">
-            <div class="digits" aria-label="Contador 2026">
-              <div class="digit"><span id="d0">2</span></div>
+            <div class="digits" aria-label="Contador">
+              <div class="digit"><span id="d0">0</span></div>
               <div class="digit"><span id="d1">0</span></div>
-              <div class="digit"><span id="d2">2</span></div>
-              <div class="digit"><span id="d3">6</span></div>
+              <div class="digit"><span id="d2">0</span></div>
+              <div class="digit"><span id="d3">0</span></div>
             </div>
             <div class="slotBtnWrap">
               <button id="btnGirar">⚡ Rodar a Sorte (1x por perfil)</button>
@@ -307,8 +307,8 @@
 
           <div class="meterWrap">
             <div class="meterLabel">
-              <span id="meterTxt">Escolha o perfil ao lado e rode.</span>
-              <span id="tempoTxt">2026</span>
+              <span id="meterTxt">Carregando números aleatórios…</span>
+              <span id="tempoTxt">—</span>
             </div>
             <div class="meter"><div class="bar" id="bar"></div></div>
           </div>
@@ -318,8 +318,8 @@
       <section class="card">
         <h1>Há sorte em ciência?</h1>
         <p class="sub">
-          Você escolhe o perfil. O ano <b>2026</b> decide sua <b>SORTE</b> e um <b>mini-plano</b>.
-          Regra: <b>1 rodada por perfil</b>. Sem reset. Sem segunda chance.
+          Antes de rodar, o painel mostra <b>números aleatórios</b>. Ao clicar, ele gira com suspense,
+          trava em <b>2026</b> e revela sua <b>SORTE</b> + um mini-plano.
         </p>
 
         <div class="row">
@@ -337,11 +337,11 @@
         </div>
 
         <div class="pill">
-          <div>📌 <strong>Regra:</strong> 1 vez por perfil. Mudou o perfil → você tem a chance daquele perfil.</div>
+          <div>📌 <strong>Regra:</strong> 1 vez por perfil. Mudou o perfil → pode jogar naquele perfil.</div>
         </div>
 
         <div class="pill">
-          <div>🎶 <strong>Vitória:</strong> toca uma musiquinha de 2026 no resultado.</div>
+          <div>🔊 <strong>Áudio:</strong> som de giro durante a roleta + musiquinha de vitória no resultado.</div>
         </div>
       </section>
     </div>
@@ -421,6 +421,29 @@
       colaborador:"Colaborador"
     };
 
+    // ===== Random forte (evita resultados “iguais” entre celulares) =====
+    function cryptoFloat(){
+      if (window.crypto && crypto.getRandomValues){
+        const u = new Uint32Array(1);
+        crypto.getRandomValues(u);
+        return (u[0] / 4294967296); // [0,1)
+      }
+      return Math.random();
+    }
+    function rand(){
+      // mistura com tempo/performance para quebrar padrões em alguns browsers
+      const t = (Date.now() % 1000000) / 1000000;
+      const p = (performance.now() % 100000) / 100000;
+      let x = cryptoFloat();
+      x = (x + t*0.37 + p*0.21) % 1;
+      return x;
+    }
+    function rint(min, max){ // inclusive min, exclusive max
+      return Math.floor(rand() * (max - min)) + min;
+    }
+    function pick(arr){ return arr[rint(0, arr.length)]; }
+    function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
+
     const banco = {
       graduando: [
         {type:"good", sorte:"Seu TCC será nota 10 (ou muito perto). Você vai surpreender com clareza.", tarefas:"1) Entregue o projeto.\n2) Faça 1 figura boa.\n3) Ensaie 6 slides."},
@@ -466,9 +489,6 @@
       ]
     };
 
-    function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
-    function clamp(n,a,b){ return Math.max(a, Math.min(b, n)); }
-
     function setBadge(type){
       badgeTipo.className = "badge";
       if(type === "good"){ badgeTipo.classList.add("good"); badgeTipo.textContent = "SORTE BOA ✨"; }
@@ -483,7 +503,7 @@
     modalBackdrop.addEventListener("click", (e)=>{ if(e.target === modalBackdrop) closeModal(); });
     window.addEventListener("keydown", (e)=>{ if(e.key === "Escape") closeModal(); });
 
-    // Fogos para cima
+    // ===== Fogos para CIMA =====
     function fireworksUp(){
       fireworksLayer.innerHTML = "";
       fireworksLayer.style.display = "block";
@@ -497,25 +517,25 @@
       const h = window.innerHeight;
 
       for(let b=0;b<bursts;b++){
-        const baseX = Math.random() * w;
+        const baseX = rand() * w;
         const baseY = h - 30;
-        const burstDelay = b * 150 + Math.random()*130;
+        const burstDelay = b * 150 + rand()*130;
 
         for(let i=0;i<sparksPerBurst;i++){
           const s = document.createElement("div");
           s.className = "spark";
-          s.style.background = colors[Math.floor(Math.random()*colors.length)];
+          s.style.background = colors[Math.floor(rand()*colors.length)];
 
-          const angle = (Math.random() * Math.PI) + Math.PI; // 180..360
-          const power = 130 + Math.random()*300;
+          const angle = (rand() * Math.PI) + Math.PI; // 180..360
+          const power = 130 + rand()*300;
           const dx = Math.cos(angle) * power;
           const dy = Math.sin(angle) * power;
 
-          const upBoost = 320 + Math.random()*520;
+          const upBoost = 320 + rand()*520;
           const finalDy = dy - upBoost;
 
-          const dur = durMin + Math.random()*(durMax-durMin);
-          const delay = burstDelay + Math.random()*140;
+          const dur = durMin + rand()*(durMax-durMin);
+          const delay = burstDelay + rand()*140;
 
           s.style.left = baseX + "px";
           s.style.top = baseY + "px";
@@ -524,10 +544,10 @@
           s.style.setProperty("--dx", dx.toFixed(1) + "px");
           s.style.setProperty("--dy", finalDy.toFixed(1) + "px");
 
-          const size = 4 + Math.random()*7;
+          const size = 4 + rand()*7;
           s.style.width = size + "px";
           s.style.height = size + "px";
-          s.style.opacity = (0.78 + Math.random()*0.22).toFixed(2);
+          s.style.opacity = (0.78 + rand()*0.22).toFixed(2);
 
           fireworksLayer.appendChild(s);
         }
@@ -539,8 +559,10 @@
       }, 2600);
     }
 
-    // Música de vitória (mais alta)
+    // ===== Áudio (giro + vitória) =====
     let audioCtx = null;
+    let spinNode = null;
+
     function ensureAudio(){
       if(!audioCtx){
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -551,13 +573,82 @@
       return audioCtx;
     }
 
+    // Som de giro contínuo (começa no clique e para no fim)
+    function startSpinSound(){
+      const ctx = ensureAudio();
+      stopSpinSound();
+
+      const now = ctx.currentTime;
+
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.22, now + 0.05); // volume do giro
+      master.connect(ctx.destination);
+
+      // ruído "areia" + oscilador (sensação mecânica)
+      const bufferSize = 2 * ctx.sampleRate;
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) output[i] = (Math.random() * 2 - 1) * 0.35;
+
+      const noise = ctx.createBufferSource();
+      noise.buffer = noiseBuffer;
+      noise.loop = true;
+
+      const noiseFilter = ctx.createBiquadFilter();
+      noiseFilter.type = "bandpass";
+      noiseFilter.frequency.setValueAtTime(900, now);
+      noiseFilter.Q.setValueAtTime(0.9, now);
+
+      const hum = ctx.createOscillator();
+      hum.type = "sawtooth";
+      hum.frequency.setValueAtTime(140, now);
+
+      const humGain = ctx.createGain();
+      humGain.gain.setValueAtTime(0.08, now);
+
+      // “acelera/desacelera” levemente durante o giro
+      hum.frequency.linearRampToValueAtTime(210, now + 1.2);
+      hum.frequency.linearRampToValueAtTime(160, now + 3.0);
+
+      noise.connect(noiseFilter);
+      noiseFilter.connect(master);
+
+      hum.connect(humGain);
+      humGain.connect(master);
+
+      noise.start(now);
+      hum.start(now);
+
+      spinNode = { master, noise, hum };
+    }
+
+    function stopSpinSound(){
+      if(!spinNode || !audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      try{
+        spinNode.master.gain.cancelScheduledValues(now);
+        spinNode.master.gain.setValueAtTime(Math.max(spinNode.master.gain.value, 0.0001), now);
+        spinNode.master.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      }catch(e){}
+
+      setTimeout(()=>{
+        try{ spinNode.noise.stop(); }catch(e){}
+        try{ spinNode.hum.stop(); }catch(e){}
+        try{ spinNode.master.disconnect(); }catch(e){}
+        spinNode = null;
+      }, 220);
+    }
+
+    // Música de vitória (mais alta)
     function playVictory2026(){
       const ctx = ensureAudio();
       const now = ctx.currentTime;
 
       const master = ctx.createGain();
       master.gain.setValueAtTime(0.0001, now);
-      master.gain.exponentialRampToValueAtTime(0.55, now + 0.02);
+      master.gain.exponentialRampToValueAtTime(0.60, now + 0.02); // mais alto
       master.gain.exponentialRampToValueAtTime(0.0001, now + 1.7);
       master.connect(ctx.destination);
 
@@ -581,7 +672,7 @@
         g.gain.exponentialRampToValueAtTime(0.0001, t + len);
       }
 
-      function note(freq, t, len=0.14, vol=0.22, type="sawtooth"){
+      function note(freq, t, len=0.14, vol=0.24, type="sawtooth"){
         const o = ctx.createOscillator();
         const g = ctx.createGain();
         o.type = type;
@@ -596,34 +687,33 @@
         o.stop(t + len + 0.03);
       }
 
-      const C4=261.63, D4=293.66, E4=329.63, F4=349.23, G4=392.00, A4=440.00, B4=493.88, C5=523.25, E5=659.25, G5=783.99;
+      const C4=261.63, E4=329.63, G4=392.00, F4=349.23, A4=440.00, B4=493.88, C5=523.25, E5=659.25, G5=783.99;
       const melody = [
         [C4,0.00],[E4,0.12],[G4,0.24],[C5,0.36],
         [E5,0.52],[G5,0.68],[E5,0.84],[C5,1.00],
         [G4,1.16],[C5,1.28],[E5,1.40]
       ];
-      melody.forEach(([f, off]) => note(f, now + off, 0.14, 0.24, "sawtooth"));
+      melody.forEach(([f, off]) => note(f, now + off, 0.14, 0.26, "sawtooth"));
 
       const chords = [
         [C4,E4,G4, 0.02],
         [F4,A4,C5, 0.50],
-        [G4,B4,D4*2, 0.98],
+        [G4,B4,587.33, 0.98], // D5 aprox
         [C4,E4,G4, 1.30]
       ];
       chords.forEach(([r, t3, f, off])=>{
-        note(r,  now+off, 0.32, 0.10, "triangle");
-        note(t3, now+off, 0.32, 0.08, "triangle");
-        note(f,  now+off, 0.32, 0.07, "triangle");
+        note(r,  now+off, 0.32, 0.11, "triangle");
+        note(t3, now+off, 0.32, 0.09, "triangle");
+        note(f,  now+off, 0.32, 0.08, "triangle");
       });
 
-      const C3=130.81, G3=196.00, F3=174.61;
-      note(C3, now+0.02, 0.35, 0.12, "square");
-      note(F3, now+0.50, 0.35, 0.10, "square");
-      note(G3, now+0.98, 0.35, 0.11, "square");
-      note(C3, now+1.30, 0.45, 0.12, "square");
+      note(130.81, now+0.02, 0.35, 0.13, "square"); // C3
+      note(174.61, now+0.50, 0.35, 0.11, "square"); // F3
+      note(196.00, now+0.98, 0.35, 0.12, "square"); // G3
+      note(130.81, now+1.30, 0.45, 0.13, "square"); // C3
     }
 
-    // Uma vez por perfil
+    // ===== 1x por perfil (persistência local) =====
     const STORAGE_KEY = "sorte2026_oncePerProfile";
     function loadState(){
       try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); }
@@ -640,7 +730,34 @@
       saveState(st);
     }
 
-    // Suspense 2026
+    // ===== Números aleatórios antes de girar =====
+    let idleTimer = null;
+    let isSpinning = false;
+
+    function setDigits(a,b,c,d){
+      d0.textContent = String(a);
+      d1.textContent = String(b);
+      d2.textContent = String(c);
+      d3.textContent = String(d);
+    }
+    function randomDigitsNow(){
+      setDigits(rint(0,10), rint(0,10), rint(0,10), rint(0,10));
+    }
+    function startIdleDigits(){
+      stopIdleDigits();
+      randomDigitsNow();
+      tempoTxt.textContent = "????";
+      meterTxt.textContent = "Números aleatórios… pronto pra rodar.";
+      idleTimer = setInterval(()=>{
+        if(isSpinning) return;
+        randomDigitsNow();
+      }, 650);
+    }
+    function stopIdleDigits(){
+      if(idleTimer){ clearInterval(idleTimer); idleTimer = null; }
+    }
+
+    // ===== Suspense 2026 =====
     let timers = [];
     function clearTimers(){ timers.forEach(t=>clearInterval(t)); timers = []; }
 
@@ -670,15 +787,16 @@
 
       const configs = spans.map((_, i) => {
         const base = 44 + i*20;
-        const jitter = Math.floor(Math.random()*55);
+        const jitter = Math.floor(rand()*55);
         const interval = base + jitter;
-        const stopAt = clamp(totalMs - (1100 + i*380) + Math.floor(Math.random()*420), 1600, totalMs-260);
+        const stopAt = clamp(totalMs - (1100 + i*380) + Math.floor(rand()*420), 1600, totalMs-260);
         return { interval, stopAt };
       });
 
       configs.forEach((cfg, i) => {
         const span = spans[i];
-        let current = parseInt(span.textContent, 10) || 0;
+        let current = parseInt(span.textContent, 10);
+        if(Number.isNaN(current)) current = rint(0,10);
 
         const id = setInterval(() => {
           const elapsed = performance.now() - start;
@@ -714,6 +832,7 @@
           spans.forEach((span, i)=> span.textContent = target[i]);
           bar.style.width = "100%";
           meterTxt.textContent = "😮 Revelando sua sorte…";
+          tempoTxt.textContent = "2026";
           resolve();
         }, totalMs + 60);
       });
@@ -728,13 +847,15 @@
         btnGirar.disabled = true;
         btnGirar.textContent = "✅ Já foi (este perfil já rodou)";
         meterTxt.textContent = "Este perfil já jogou. Troque o perfil para jogar o próximo.";
+        tempoTxt.textContent = "2026";
+        stopIdleDigits();
+        setDigits(2,0,2,6);
       }else{
         btnGirar.disabled = false;
         btnGirar.textContent = "⚡ Rodar a Sorte (1x por perfil)";
-        meterTxt.textContent = "Este perfil ainda não jogou. Pode rodar.";
+        startIdleDigits();
       }
 
-      tempoTxt.textContent = "2026";
       slotCaption.innerHTML =
         `🎲 <b>Vale 1x por perfil</b>. Perfil atual: <b>${labels[profile]}</b>.<br/>
          Dica: troque o perfil para jogar novamente (no outro perfil).`;
@@ -744,11 +865,17 @@
       const profile = perfilSel.value;
       if(alreadySpun(profile)) return;
 
+      isSpinning = true;
       btnGirar.disabled = true;
       clearTimers();
+      stopIdleDigits();
 
-      const totalMs = 4200 + Math.floor(Math.random() * 3800);
+      startSpinSound(); // som de giro começa aqui
+
+      const totalMs = 4200 + Math.floor(rand() * 3800);
       await spinDigits(totalMs);
+
+      stopSpinSound(); // para o som de giro no fim do giro
 
       const out = pick(banco[profile] || banco.graduando);
       setBadge(out.type);
@@ -771,6 +898,7 @@
       playVictory2026();
       showModal();
 
+      isSpinning = false;
       refreshUI();
     }
 
@@ -778,6 +906,7 @@
 
     perfilSel.addEventListener("change", () => {
       closeModal();
+      isSpinning = false;
       refreshUI();
     });
 
@@ -807,6 +936,7 @@
       setTimeout(()=> btnSalvar.textContent = "💾 Salvar", 1200);
     });
 
+    // Inicial
     refreshUI();
   </script>
 </body>
